@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЗАПЛАТИ - Текущ Месец</title>
+    <!-- Пълен линк към иконата в GitHub -->
+    <link rel="icon" type="image/png" href="https://otchet-makkuin-disney.github.io/zaplati/logo-makkuin.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --google-purple: #673ab7; --bg-color: #f0ebf8; }
+        
+        body { 
+            margin: 0; 
+            background-color: var(--bg-color); 
+            /* Логото като фон тип воден знак */
+            background-image: url('https://otchet-makkuin-disney.github.io/zaplati/IMG_2002.png');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-size: 50%;
+            font-family: 'Roboto', sans-serif; 
+            padding: 0;
+            font-size: 13px;
+            min-height: 100vh;
+        }
+
+        /* Прозрачен слой за четливост */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(240, 235, 248, 0.7); 
+            z-index: -1;
+        }
+
+        .container { max-width: 850px; margin: 40px auto; padding: 0 10px; position: relative; z-index: 1; }
+        
+        /* Стилизирана заглавна част с лога */
+        .header-accent { height: 10px; background: var(--google-purple); border-radius: 8px 8px 0 0; }
+        
+        .form-title { 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 15px 24px; 
+            border-radius: 0 0 8px 8px; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+            margin-bottom: 15px; 
+            text-align:center; 
+            position: relative; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(5px);
+        }
+
+        h1 { margin: 0; font-size: 20px; color: #333; flex-grow: 1; }
+
+        /* Бутон за навигация обратно - Премахнато target="_blank" */
+        .nav-link-btn {
+            background: #4caf50; 
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 11px;
+            transition: 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .nav-link-btn:hover { background: #43a047; transform: translateY(-1px); }
+
+        /* Контейнер за логото */
+        .logos-container {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+
+        .header-logo {
+            height: 55px; 
+            width: auto;
+            object-fit: contain;
+        }
+
+        .question-card { 
+            background: rgba(255, 255, 255, 0.96); 
+            padding: 20px; 
+            border-radius: 8px; 
+            border: 1px solid #dadce0; 
+            margin-bottom: 12px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: #202124; }
+        select, input { width: 100%; border: none; border-bottom: 1px solid #dadce0; padding: 10px 0; outline: none; font-size: 15px; background: transparent; }
+        select:focus, input:focus { border-bottom: 2px solid var(--google-purple); }
+        
+        .btn { background: var(--google-purple); color: white; border: none; padding: 14px; border-radius: 4px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 10px; font-size: 14px; transition: 0.3s; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        
+        #successStatus { color: #2e7d32; font-weight: bold; text-align: center; margin-top: 10px; display: none; }
+        
+        .today-container { background: rgba(255, 255, 255, 0.96); border-radius: 8px; border: 1px solid #ddd; overflow: hidden; margin-bottom: 20px; }
+        .today-header { background: #e8f0fe; padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd; text-align: center; }
+        .today-scroll { max-height: 380px; overflow-y: auto; scroll-behavior: smooth; }
+        .today-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .today-table td, .today-table th { padding: 10px; border-bottom: 1px solid #eee; text-align: center; }
+
+        .staff-section { background: rgba(255, 255, 255, 0.98); border-radius: 8px; padding: 15px; margin-bottom: 30px; border-top: 5px solid var(--google-purple); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .staff-title { font-weight: bold; font-size: 16px; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { background: #f8f9fa; padding: 8px; border: 1px solid #ddd; }
+        td { padding: 6px; border: 1px solid #ddd; text-align: center; }
+
+        .final-box { background: #f9f9f9; border: 1px solid #eee; padding: 10px; margin-top: 10px; border-radius: 5px; }
+        .summary-line { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #ddd; font-size: 13px; }
+        
+        #passArea { text-align: center; padding: 30px; background: rgba(255, 255, 255, 0.95); border-radius: 8px; margin-top: 40px; border: 1px solid #ddd; }
+        
+        .nav-controls { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
+        .nav-btn { background: #fff; border: 1px solid var(--google-purple); color: var(--google-purple); padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: 0.3s; }
+        
+        .dashboard { display: flex; gap: 8px; margin: 15px 0; flex-wrap: wrap; }
+        .dash-box { flex: 1; min-width: 120px; padding: 12px 8px; border-radius: 6px; text-align: center; color: #fff; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .dash-avans { background-color: #fbc02d; color: #000; }
+        .dash-zaplaty { background-color: #8d6e63; }
+        .dash-total { background-color: #d32f2f; }
+        .dash-label { font-size: 10px; display: block; margin-bottom: 4px; text-transform: uppercase; opacity: 0.9; }
+        .dash-value { font-size: 16px; }
+
+        .advance-control { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+        .advance-input { width: 80px !important; font-size: 12px !important; padding: 5px !important; }
+        .advance-btn { background: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; }
+
+        #offlineBanner {
+            display: none; position: sticky; top: 0; z-index: 1000;
+            background: #d32f2f; color: #fff; text-align: center;
+            padding: 8px; font-weight: bold; font-size: 12px; border-radius: 6px; margin-bottom: 10px;
+        }
+        #offlineBanner.show-queue { background: #f57c00; }
+
+        .row-actions { display: flex; gap: 4px; justify-content: center; }
+        .icon-btn {
+            background: transparent; border: 1px solid #ccc; color: #555;
+            padding: 3px 7px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: normal;
+        }
+        .icon-btn:hover { background: #eee; }
+        .icon-btn.edit-btn { color: #1976d2; border-color: #1976d2; }
+
+        .modal-overlay {
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #fff; border-radius: 8px; padding: 20px; width: 90%; max-width: 380px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .modal-box h3 { margin: 0 0 12px 0; color: var(--google-purple); font-size: 15px; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+        .modal-actions button { width: auto; margin-top: 0; padding: 10px 16px; }
+        .modal-actions button.cancel-btn { background: #9e9e9e; }
+        .modal-actions button.danger-btn { background: #d32f2f; }
+
+        .toolbar-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+        .toolbar-row input { flex: 1; min-width: 150px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; }
+        .small-btn { width: auto; padding: 8px 14px; font-size: 11px; margin-top: 0; }
+        .csv-btn { background: #2e7d32; }
+        .csv-btn:hover { background: #1b5e20; }
+        .settings-btn { background: #546e7a; }
+        .settings-btn:hover { background: #37474f; }
+
+        #undoBox { display: none; text-align: center; margin-top: 8px; }
+        #undoBox button { background: #d32f2f; font-size: 11px; padding: 6px 14px; width: auto; margin-top: 0; }
+
+        #ratesPanel { display: none; background: rgba(255,255,255,0.98); border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; border: 2px solid #546e7a; }
+        #ratesPanel h3 { margin-top:0; color:#546e7a; }
+        .rates-grid { display: grid; grid-template-columns: 1.1fr 1fr 0.65fr 0.75fr 30px; gap: 8px 6px; align-items: center; max-height: 320px; overflow-y: auto; padding-right: 6px; }
+        .rates-grid label { margin: 0; font-size: 10px; color: #777; text-transform: uppercase; }
+        .rates-grid input { border: 1px solid #ccc; border-radius: 4px; padding: 6px; font-size: 12px; width: 100%; box-sizing: border-box; }
+        .rates-grid .del-row-btn { background: transparent; border: 1px solid #d32f2f; color: #d32f2f; border-radius: 4px; cursor: pointer; height: 30px; }
+        #ratesStatus { font-size: 11px; margin-top: 8px; text-align: center; font-weight: bold; }
+
+        .trend-wrap { display:flex; align-items:flex-end; gap:3px; height:50px; margin-top:8px; }
+        .trend-bar { flex: 1; background: linear-gradient(180deg, #9575cd, var(--google-purple)); border-radius: 2px 2px 0 0; min-height: 2px; position: relative; }
+        .trend-bar:hover::after {
+            content: attr(data-label); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            background: #263238; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 3px; white-space: nowrap; margin-bottom: 3px; z-index: 5;
+        }
+
+        @media (max-width: 600px) {
+            .form-title { padding: 15px; flex-direction: column; gap: 10px; }
+            h1 { order: 1; font-size: 18px; }
+            .nav-link-btn { order: 3; width: 100%; text-align: center; }
+            .logos-container { order: 2; margin: 0; }
+            .header-logo { height: 45px; }
+        }
+    </style>
+    <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div id="offlineBanner"></div>
+    <div class="header-accent"></div>
+    <div class="form-title">
+        <!-- Бутон за връщане - вече се отваря в същия прозорец -->
+        <a href="https://otchet-makkuin-disney.github.io/" class="nav-link-btn">◀ КЪМ ОТЧЕТ</a>
+        <h1>ОТЧЕТ ЗАПЛАТИ</h1>
+        <div class="logos-container">
+            <!-- Само логото на Маккуин остава тук -->
+            <img src="https://otchet-makkuin-disney.github.io/zaplati/IMG_2002.png" alt="McQueen Logo" class="header-logo" onerror="this.style.display='none'">
+        </div>
+    </div>
+
+    <!-- ФОРМА ЗА ВЪВЕЖДАНЕ -->
+    <div class="question-card">
+        <form autocomplete="off">
+            <label>СЛУЖИТЕЛ</label>
+            <select id="staffSel" onchange="validateForm()">
+                <option value="" disabled selected>Изберете име...</option>
+            </select>
+            <label style="margin-top:15px">ИЗРАБОТЕНИ ЧАСОВЕ</label>
+            <label style="margin-top:15px">РАБОТНО ВРЕМЕ</label>
+            <div style="display:flex; gap:14px;">
+                <div style="flex:1;">
+                    <label style="font-size:10px; text-transform:uppercase; color:#777; margin-bottom:4px;">Начален час</label>
+                    <input type="time" id="start_time">
+                </div>
+                <div style="flex:1;">
+                    <label style="font-size:10px; text-transform:uppercase; color:#777; margin-bottom:4px;">Краен час</label>
+                    <input type="time" id="end_time">
+                </div>
+            </div>
+            <div id="computedHoursBox" style="display:none; margin-top:10px; padding:10px; background:#f0ebf8; border-radius:6px; text-align:center; font-weight:bold; color:var(--google-purple);">
+                Изработени часове: <span id="computedHoursVal">0</span> ч.
+                <div id="computedEarningsRow" style="margin-top:4px; font-size:15px; color:#2e7d32;">Заработка: <span id="computedEarningsVal">0.00</span> €</div>
+                <div id="hoursErrorMsg" style="display:none; margin-top:6px; font-size:11px; color:#d32f2f; font-weight:normal;">⚠ Началният и крайният час не могат да съвпадат!</div>
+            </div>
+            <label style="margin-top:15px">БОНУС (€)</label>
+            <input type="text" id="b_val" placeholder="0.00" inputmode="decimal" oninput="this.value = this.value.replace(/[^0-9.,-]/g, '').replace(',', '.'); updateEarningsDisplay();">
+            <div id="paidReminder" style="margin-top:14px; padding:10px 12px; background:#fff3e0; border:1.5px solid #ffcc80; border-radius:8px; font-size:12px; color:#795548;">
+                ⚠️ Не забравяй да отбележиш дали сумата вече е изплатена на служителя!
+            </div>
+            <label class="paid-checkbox-row" style="margin-top:8px; display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:normal;">
+                <input type="checkbox" id="paidCheckbox" style="width:18px; height:18px; margin:0;">
+                <span>Сумата е изплатена ли?</span>
+            </label>
+            <button type="button" class="btn" id="saveBtn" disabled>ЗАПИШИ ДАННИТЕ</button>
+            <div id="successStatus">✅ Успешно изпратено!</div>
+            <div id="undoBox"><button type="button" id="undoBtn">↩ Отмени последния запис (<span id="undoTimer">8</span>с)</button></div>
+        </form>
+    </div>
+
+    <div class="question-card" style="text-align:center;">
+        <button type="button" class="btn small-btn settings-btn" id="toggleRatesBtn" style="width:auto;">⚙ Ставки на служителите</button>
+        <div id="ratesPassGate" style="display:none; margin-top:12px;">
+            <input type="password" id="ratesPassField" placeholder="Парола" inputmode="numeric" style="max-width:150px; text-align:center; display:inline-block;">
+            <button type="button" class="btn small-btn settings-btn" id="ratesPassOkBtn" style="width:auto;">Отключи</button>
+            <div id="ratesGateStatus" style="font-size:11px; color:#d32f2f; margin-top:6px;"></div>
+        </div>
+    </div>
+
+    <div id="ratesPanel">
+        <h3>Персонал — имена, категории, ставки и пароли</h3>
+        <div class="rates-grid" id="ratesGridHeader">
+            <label>Име</label><label>Категория</label><label>Ставка €/ч</label><label>Парола</label><label></label>
+        </div>
+        <div class="rates-grid" id="ratesGrid"></div>
+        <div class="modal-actions" style="justify-content:space-between; margin-top:12px;">
+            <button type="button" class="settings-btn" style="width:auto;" id="addStaffRowBtn">+ Добави служител</button>
+            <button type="button" id="saveRatesBtn">Запази промените</button>
+        </div>
+        <div id="ratesStatus"></div>
+    </div>
+
+    <!-- ИНДИВИДУАЛНА СПРАВКА -->
+    <div class="question-card" style="border-left: 5px solid #2196F3;">
+        <label>ИНДИВИДУАЛНА СПРАВКА</label>
+        <select id="userViewSel">
+            <option value="" disabled selected>Изберете име...</option>
+        </select>
+        <input type="password" id="userPass" placeholder="Парола (цифри)" inputmode="numeric" style="margin-top:10px; width: 150px; text-align: center;" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+        <button class="btn" style="background: #2196F3;" onclick="viewIndividual()">ВИЖ МОЯТА ТАБЛИЦА</button>
+    </div>
+
+    <!-- ТАБЛИЦА С ДНЕШНИ ЗАПИСИ -->
+    <div class="today-container">
+        <div class="today-header">ДНЕШНИ ЗАПИСИ</div>
+        <div style="padding:8px 10px 0 10px;">
+            <input type="text" id="todayFilter" placeholder="🔍 Търсене по служител..." style="width:100%; box-sizing:border-box; border:1px solid #ccc; border-radius:4px; padding:8px;">
+        </div>
+        <div id="todayScrollBox" class="today-scroll">
+            <table class="today-table">
+                <thead>
+                    <tr>
+                        <th>Служител</th>
+                        <th>Часове</th>
+                        <th>Бонус / Аванс</th>
+                        <th>Изплатено</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="todayBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ПЪЛЕН ОТЧЕТ (ПИН) -->
+    <div id="passArea">
+        <label>Парола за Управител (Пълен отчет):</label>
+        <input type="password" id="p_field" style="width: 150px; text-align: center;">
+        <button class="btn" onclick="unlock()" style="margin-top:15px;">ОТКЛЮЧИ ВСИЧКИ</button>
+    </div>
+
+    <!-- МЕСЕЧЕН ОТЧЕТ (СКРИТ) -->
+    <div id="monthlyArea" style="display:none; margin-top: 20px;"></div>
+</div>
+
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <h3>Редакция на запис</h3>
+        <label>Служител</label>
+        <select id="edit_staff"></select>
+        <label style="margin-top:12px">Часове (-1 = аванс)</label>
+        <input type="text" id="edit_hours" inputmode="decimal" oninput="this.value = this.value.replace(/[^0-9.,-]/g, '').replace(',', '.');">
+        <label style="margin-top:12px">Бонус / Сума на аванса (€)</label>
+        <input type="text" id="edit_bonus" inputmode="decimal" oninput="this.value = this.value.replace(/[^0-9.,-]/g, '').replace(',', '.');">
+        <label class="paid-checkbox-row" style="margin-top:12px; display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:normal;">
+            <input type="checkbox" id="edit_paid" style="width:18px; height:18px; margin:0;">
+            <span>Сумата е изплатена ли?</span>
+        </label>
+        <div id="editModalStatus" style="font-size:11px; font-weight:bold; margin-top:8px;"></div>
+        <div class="modal-actions">
+            <button type="button" class="cancel-btn" id="editCancelBtn">Отказ</button>
+            <button type="button" class="danger-btn" id="editDeleteBtn">Изтрий</button>
+            <button type="button" id="editSaveBtn">Запази</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    Parse.initialize("nRZ2VJnuAxFbP1DPxK524AAL4rUh6avCTbTnQUsL", "MXB3Tw1iF1Cw1HrqKZFFUhf7DHETzaOezipXcPtw");
+    Parse.serverURL = 'https://parseapi.back4app.com/';
+
+    let staffRates = {
+        "Ваня": 5.25, "Виктория": 3.60, "Надя": 3.50, "Елисавета": 4.00,
+        "Николай": 5.25, "Домна": 4.00, "Барбара": 4.00, "Пламена": 3.80, "Елеонора": 3.50, "Роси": 3.50,
+        "Вили": 3.80, "Ирина": 3.50, "Миро": 5.7, "Павлина": 5.7
+    };
+    let ratesObjectId = null;
+
+    let staffCategories = {
+        "Виктория": "БАРМАН / СЕРВИТЬОР", "Елисавета": "БАРМАН / СЕРВИТЬОР",
+        "Ваня": "КУХНЯ",
+        "Николай": "АНИМАТОР", "Домна": "АНИМАТОР", "Барбара": "АНИМАТОР", "Надя": "АНИМАТОР",
+        "Пламена": "АНИМАТОР", "Вили": "АНИМАТОР", "Елеонора": "АНИМАТОР",
+        "Миро": "ДРУГИ", "Павлина": "ДРУГИ", "Роси": "ДРУГИ", "Ирина": "ДРУГИ"
+    };
+    const DEFAULT_CATEGORY = "ДРУГИ";
+
+    let userPasswords = {
+        "Михаела": "4821", "Ева": "9350", "Виктория": "1174", "Елисавета": "6209", "Ваня": "3381", 
+        "Данчо": "7742", "Надя": "5050", "Николай": "8834", "Домна": "2956", "Барбара": "4410", 
+        "Пламена": "6023", "Елеонора": "6024" , "Вили": "3562", "Миро": "6775", "Павлина": "6775"
+    };
+
+    const now = new Date();
+    const todayISO = now.toLocaleDateString('sv-SE'); 
+    let viewMonth = now.getMonth();
+    let viewYear = now.getFullYear();
+    let currentViewMode = "none";
+    const monthNames = ["ЯНУАРИ", "ФЕВРУАРИ", "МАРТ", "АПРИЛ", "МАЙ", "ЮНИ", "ЮЛИ", "АВГУСТ", "СЕПТЕМВРИ", "ОКТОМВРИ", "НОЕМВРИ", "ДЕКЕМВРИ"];
+    const HOURS_WARN_THRESHOLD = 12;
+    const BONUS_WARN_THRESHOLD = 100;
+    let allResultsCache = [];
+    let entryMap = {};
+
+    async function loadRates() {
+        try {
+            const query = new Parse.Query("PayrollSettings");
+            const res = await query.first();
+            if (res) {
+                ratesObjectId = res.id;
+                const storedRates = res.get("rates");
+                const storedPass = res.get("passwords");
+                const storedCats = res.get("categories");
+                if (storedRates) staffRates = storedRates;
+                if (storedPass) userPasswords = storedPass;
+                if (storedCats) staffCategories = storedCats;
+            }
+        } catch(e) { console.error("Rates load error", e); }
+        // За всеки служител без зададена категория - слагаме дефолтна
+        Object.keys(staffRates).forEach(name => { if (!staffCategories[name]) staffCategories[name] = DEFAULT_CATEGORY; });
+        renderStaffOptions();
+    }
+
+    // Попълва dropdown-ите (форма за въвеждане, индивидуална справка, модал за редакция) от staffRates, групирани по категория
+    function renderStaffOptions() {
+        const byCategory = {};
+        Object.keys(staffRates).sort().forEach(name => {
+            const cat = staffCategories[name] || DEFAULT_CATEGORY;
+            if (!byCategory[cat]) byCategory[cat] = [];
+            byCategory[cat].push(name);
+        });
+        let optionsHtml = '<option value="" disabled selected>Изберете име...</option>';
+        Object.keys(byCategory).sort().forEach(cat => {
+            optionsHtml += `<optgroup label="${cat}">` + byCategory[cat].map(n => `<option>${n}</option>`).join('') + `</optgroup>`;
+        });
+        document.getElementById('staffSel').innerHTML = optionsHtml;
+        document.getElementById('userViewSel').innerHTML = optionsHtml;
+        document.getElementById('edit_staff').innerHTML = optionsHtml;
+    }
+
+    function buildRatesGrid() {
+        const grid = document.getElementById('ratesGrid');
+        grid.innerHTML = '';
+        Object.keys(staffRates).sort().forEach(name => addStaffRow(name, staffCategories[name] || DEFAULT_CATEGORY, staffRates[name], userPasswords[name] || ''));
+    }
+
+    function addStaffRow(name, category, rate, password) {
+        const grid = document.getElementById('ratesGrid');
+        const row = document.createElement('div');
+        row.className = 'staff-row-group';
+        row.style.display = 'contents';
+        row.innerHTML = `
+            <input type="text" class="staff-name-input" value="${name || ''}" placeholder="Име">
+            <input type="text" class="staff-cat-input" value="${category || ''}" placeholder="Категория">
+            <input type="number" step="0.01" class="staff-rate-input" value="${rate !== undefined ? rate : ''}" placeholder="0.00">
+            <input type="text" class="staff-pass-input" value="${password || ''}" placeholder="напр. 1234" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            <button type="button" class="del-row-btn" title="Изтрий служител">✕</button>
+        `;
+        row.querySelector('.del-row-btn').addEventListener('click', () => row.remove());
+        grid.appendChild(row);
+    }
+
+    document.getElementById('addStaffRowBtn').addEventListener('click', () => addStaffRow('', DEFAULT_CATEGORY, '', ''));
+
+    const RATES_PASSWORD = 'MakKuin6775';
+    let ratesUnlocked = false;
+
+    document.getElementById('toggleRatesBtn').addEventListener('click', () => {
+        const panel = document.getElementById('ratesPanel');
+        const gate = document.getElementById('ratesPassGate');
+
+        if (panel.style.display === 'block') {
+            panel.style.display = 'none';
+            return;
+        }
+        if (ratesUnlocked) {
+            buildRatesGrid();
+            document.getElementById('ratesStatus').textContent = '';
+            panel.style.display = 'block';
+            return;
+        }
+        gate.style.display = (gate.style.display === 'block') ? 'none' : 'block';
+        document.getElementById('ratesGateStatus').textContent = '';
+        document.getElementById('ratesPassField').value = '';
+        if (gate.style.display === 'block') document.getElementById('ratesPassField').focus();
+    });
+
+    function checkRatesPassword() {
+        const st = document.getElementById('ratesGateStatus');
+        if (document.getElementById('ratesPassField').value === RATES_PASSWORD) {
+            ratesUnlocked = true;
+            document.getElementById('ratesPassGate').style.display = 'none';
+            buildRatesGrid();
+            document.getElementById('ratesStatus').textContent = '';
+            document.getElementById('ratesPanel').style.display = 'block';
+        } else {
+            st.textContent = 'Грешна парола!';
+        }
+    }
+    document.getElementById('ratesPassOkBtn').addEventListener('click', checkRatesPassword);
+    document.getElementById('ratesPassField').addEventListener('keypress', (e) => { if (e.key === 'Enter') checkRatesPassword(); });
+
+    document.getElementById('saveRatesBtn').addEventListener('click', async () => {
+        const st = document.getElementById('ratesStatus');
+        const rows = document.querySelectorAll('#ratesGrid .staff-row-group');
+        const newRates = {}, newPasswords = {}, newCategories = {};
+        let hasError = false, duplicateName = null;
+        const seenNames = new Map(); // lowercase -> брой срещания
+
+        rows.forEach(row => {
+            row.querySelector('.staff-name-input').style.borderColor = '#ccc';
+        });
+
+        rows.forEach(row => {
+            const nameInput = row.querySelector('.staff-name-input');
+            const name = nameInput.value.trim();
+            const category = row.querySelector('.staff-cat-input').value.trim();
+            const rateVal = parseFloat(row.querySelector('.staff-rate-input').value);
+            const pass = row.querySelector('.staff-pass-input').value.trim();
+            if (!name) return; // празен ред - пропускаме (все едно е изтрит)
+
+            const lower = name.toLowerCase();
+            if (seenNames.has(lower)) {
+                duplicateName = name;
+                nameInput.style.borderColor = '#d32f2f';
+                seenNames.get(lower).style.borderColor = '#d32f2f';
+                return;
+            }
+            seenNames.set(lower, nameInput);
+
+            if (isNaN(rateVal) || rateVal < 0) { hasError = true; return; }
+            newRates[name] = rateVal;
+            newCategories[name] = category || DEFAULT_CATEGORY;
+            if (pass) newPasswords[name] = pass;
+        });
+
+        if (duplicateName) {
+            st.textContent = `Името "${duplicateName}" е въведено повече от веднъж! Коригирайте маркираните редове.`;
+            st.style.color = '#d32f2f';
+            return;
+        }
+        if (hasError) {
+            st.textContent = 'Моля, въведете валидна ставка за всеки служител с попълнено име.';
+            st.style.color = '#d32f2f';
+            return;
+        }
+        if (Object.keys(newRates).length === 0) {
+            st.textContent = 'Трябва да има поне един служител.';
+            st.style.color = '#d32f2f';
+            return;
+        }
+
+        st.textContent = 'Запазване...'; st.style.color = '#555';
+        try {
+            const Settings = Parse.Object.extend("PayrollSettings");
+            const obj = new Settings();
+            if (ratesObjectId) obj.id = ratesObjectId;
+            obj.set('rates', newRates);
+            obj.set('passwords', newPasswords);
+            obj.set('categories', newCategories);
+            const saved = await obj.save();
+            ratesObjectId = saved.id;
+            staffRates = newRates;
+            staffCategories = newCategories;
+            userPasswords = newPasswords;
+            renderStaffOptions();
+            buildRatesGrid();
+            st.textContent = 'Запазено успешно!'; st.style.color = '#2e7d32';
+            if (document.getElementById('monthlyArea').style.display === 'block') loadData();
+        } catch(e) { st.textContent = 'Грешка при запазване.'; st.style.color = '#d32f2f'; }
+    });
+
+    // ----- OFFLINE / ОПАШКА ЗА ЧАКАЩИ ЗАПИСИ -----
+    const offlineBanner = document.getElementById('offlineBanner');
+    function getQueue() { try { return JSON.parse(localStorage.getItem('pendingWorkLogs') || '[]'); } catch(e) { return []; } }
+    function setQueue(q) { localStorage.setItem('pendingWorkLogs', JSON.stringify(q)); }
+
+    function updateOfflineBanner() {
+        const q = getQueue();
+        if (!navigator.onLine) {
+            offlineBanner.style.display = 'block'; offlineBanner.className = '';
+            offlineBanner.textContent = q.length
+                ? `⚠ Няма връзка с интернет. ${q.length} запис(а) чакат да се изпратят.`
+                : '⚠ Няма връзка с интернет. Записите ще се запазят локално.';
+        } else if (q.length) {
+            offlineBanner.style.display = 'block'; offlineBanner.className = 'show-queue';
+            offlineBanner.textContent = `⏳ Изпращане на ${q.length} чакащ(и) запис(а)...`;
+        } else { offlineBanner.style.display = 'none'; }
+    }
+
+    // ----- АВТОМАТИЧНА СИНХРОНИЗАЦИЯ С "ОТЧЕТ" (ReportEntry, опция "ЗАПЛАТА/АВАНС") -----
+    function computeSumForWorkLog(staff, hours, bonus) {
+        if (hours === -1) return bonus; // изплатен аванс - цялата сума е разход
+        const rate = staffRates[staff] || 0;
+        return (hours * rate) + bonus;
+    }
+
+    async function syncCreateReportEntry(workLogId, dateISO, staff, hours, bonus) {
+        const sum = computeSumForWorkLog(staff, hours, bonus);
+        if (!sum || sum <= 0) return null;
+        try {
+            const Entry = Parse.Object.extend("ReportEntry");
+            const entry = new Entry();
+            const label = (hours === -1) ? `Аванс — ${staff}` : `${staff} (${hours.toFixed(2)}ч.)`;
+            await entry.save({
+                date: dateISO,
+                option: "ЗАПЛАТА/АВАНС",
+                sum: sum,
+                notes: `[Автоматично от Заплати] ${label}`,
+                linkedWorkLogId: workLogId
+            });
+            return entry.id;
+        } catch(e) { console.error("Report sync (create) error", e); return null; }
+    }
+
+    async function syncUpdateReportEntry(workLogId, dateISO, staff, hours, bonus) {
+        const sum = computeSumForWorkLog(staff, hours, bonus);
+        try {
+            const q = new Parse.Query("ReportEntry");
+            q.equalTo("linkedWorkLogId", workLogId);
+            const existing = await q.first();
+            const label = (hours === -1) ? `Аванс — ${staff}` : `${staff} (${hours.toFixed(2)}ч.)`;
+            if (existing) {
+                existing.set('date', dateISO);
+                existing.set('sum', sum);
+                existing.set('notes', `[Автоматично от Заплати] ${label}`);
+                await existing.save();
+                return existing.id;
+            } else {
+                return await syncCreateReportEntry(workLogId, dateISO, staff, hours, bonus);
+            }
+        } catch(e) { console.error("Report sync (update) error", e); return null; }
+    }
+
+    async function syncDeleteReportEntry(workLogId) {
+        try {
+            const q = new Parse.Query("ReportEntry");
+            q.equalTo("linkedWorkLogId", workLogId);
+            const existing = await q.first();
+            if (existing) await existing.destroy();
+        } catch(e) { console.error("Report sync (delete) error", e); }
+    }
+
+    async function flushQueue() {
+        const q = getQueue();
+        if (!q.length || !navigator.onLine) return;
+        const Log = Parse.Object.extend("WorkLog");
+        const remaining = [];
+        for (const item of q) {
+            try {
+                const entry = new Log();
+                await entry.save(item);
+                await syncCreateReportEntry(entry.id, item.date, item.staff, item.hours, item.bonus);
+            }
+            catch(e) { remaining.push(item); }
+        }
+        setQueue(remaining);
+        updateOfflineBanner();
+        if (remaining.length < q.length) await loadData();
+    }
+    window.addEventListener('online', () => { updateOfflineBanner(); flushQueue(); });
+    window.addEventListener('offline', updateOfflineBanner);
+
+    document.getElementById('userPass').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') viewIndividual();
+    });
+
+    document.getElementById('p_field').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') unlock();
+    });
+
+    async function loadData() {
+        const query = new Parse.Query("WorkLog");
+        query.limit(1000).ascending("date");
+        try {
+            const results = await query.find();
+            allResultsCache = results;
+            entryMap = {};
+            results.forEach(r => entryMap[r.id] = r);
+
+            const tBody = document.getElementById('todayBody');
+            tBody.innerHTML = '';
+            results.filter(r => r.get("date") === todayISO).forEach(l => {
+                let h = l.get("hours");
+                let b = l.get("bonus") || 0;
+                let displayHours = (h === -1) ? "-" : h + " ч.";
+                let displayBonus = (h === -1) ? "АВАНС" : b + " €";
+                let paidBadge = l.get("paid")
+                    ? '<span style="color:#2e7d32;font-weight:bold;" title="Изплатено">✅</span>'
+                    : '<span style="color:#c62828;font-weight:bold;" title="Не е изплатено">❌</span>';
+                tBody.innerHTML += `<tr data-search="${l.get("staff").toLowerCase()}"><td>${l.get("staff")}</td><td>${displayHours}</td><td>${displayBonus}</td><td>${paidBadge}</td>
+                    <td><button type="button" class="icon-btn edit-btn" onclick="openEditModal('${l.id}')">✎</button></td></tr>`;
+            });
+            applyTodayFilter();
+
+            if(document.getElementById('monthlyArea').style.display === 'block') {
+                const filtered = results.filter(r => {
+                    const d = new Date(r.get("date"));
+                    return d.getMonth() === viewMonth && d.getFullYear() === viewYear;
+                });
+                renderMonthly(filtered);
+            }
+            updateOfflineBanner();
+        } catch(e) {
+            console.error("Load Error", e);
+            offlineBanner.style.display = 'block'; offlineBanner.className = '';
+            offlineBanner.textContent = '⚠ Грешка при зареждане на данните. Проверете връзката и опреснете страницата.';
+        }
+    }
+
+    function applyTodayFilter() {
+        const q = document.getElementById('todayFilter').value.trim().toLowerCase();
+        document.querySelectorAll('#todayBody tr').forEach(tr => {
+            const s = tr.getAttribute('data-search') || '';
+            tr.style.display = (!q || s.includes(q)) ? '' : 'none';
+        });
+    }
+    document.getElementById('todayFilter').addEventListener('input', applyTodayFilter);
+
+    function renderMonthly(results) {
+        const area = document.getElementById('monthlyArea');
+        area.innerHTML = '';
+        let globalPaidAvansi = 0, globalOstatyk = 0, globalTotalFond = 0;
+        window._payrollCsvRows = [];
+
+        area.innerHTML = `
+            <div class="nav-controls">
+                <button class="nav-btn" onclick="changeMonth(-1)">◀ ПРЕДХОДЕН</button>
+                <button class="nav-btn" onclick="changeMonth(0)">ТЕКУЩ</button>
+                <button class="nav-btn" onclick="changeMonth(1)">СЛЕДВАЩ ▶</button>
+                <button class="nav-btn csv-btn" style="color:#fff;" onclick="exportPayrollCsv()">⬇ CSV</button>
+            </div>
+            <h2 style="text-align:center">${monthNames[viewMonth]} ${viewYear}</h2>
+            <div id="dashContainer"></div>
+        `;
+
+        Object.entries(staffRates).forEach(([name, rate]) => {
+            if (currentViewMode !== "admin" && currentViewMode !== name) return;
+            const logs = results.filter(r => r.get("staff") === name);
+            if(logs.length === 0 && currentViewMode === "admin") return;
+
+            let общаЗаработка = 0; let сумаАванси = 0; let общоЧасове = 0;
+            let html = `<div class="staff-section"><div class="staff-title">${name} (${rate}€)</div><table><thead><tr><th>Дата</th><th>Часове</th><th>Заработка</th><th>Бонус</th>${currentViewMode === "admin" ? '<th>Действия</th>' : ''}</tr></thead><tbody>`;
+
+            logs.forEach(l => {
+                const h = l.get("hours") || 0;
+                const b = l.get("bonus") || 0;
+                const actionsCell = currentViewMode === "admin" ? `<td><button type="button" class="icon-btn edit-btn" onclick="openEditModal('${l.id}')">✎</button></td>` : '';
+                if (h === -1) {
+                    сумаАванси += b;
+                    html += `<tr style="background:#fff3e0"><td>${l.get("date")}</td><td colspan="2">ИЗПЛАТЕН АВАНС</td><td style="color:red">-${b.toFixed(2)}</td>${actionsCell}</tr>`;
+                    window._payrollCsvRows.push([l.get("date"), name, "АВАНС", "", -b.toFixed(2)]);
+                } else {
+                    const dayEarn = h * rate;
+                    общаЗаработка += (dayEarn + b);
+                    общоЧасове += h;
+                    html += `<tr><td>${l.get("date")}</td><td>${h}</td><td>${dayEarn.toFixed(2)}</td><td>${b.toFixed(2)}</td>${actionsCell}</tr>`;
+                    window._payrollCsvRows.push([l.get("date"), name, h, dayEarn.toFixed(2), b.toFixed(2)]);
+                }
+            });
+
+            const остатъкЗаПлащане = общаЗаработка - сумаАванси;
+            globalPaidAvansi += сумаАванси; globalOstatyk += остатъкЗаПлащане; globalTotalFond += общаЗаработка;
+
+            html += `</tbody></table>`;
+            if (currentViewMode === "admin") {
+                html += `<div class="advance-control">
+                    <input type="number" id="adv_${name.replace(/\s/g,'')}" class="advance-input" placeholder="Сума €">
+                    <button class="advance-btn" onclick="payAdvance('${name}')">ИЗПЛАТИ АВАНС</button>
+                </div>`;
+            }
+
+            html += `<div class="final-box">
+                <div class="summary-line"><span>ОБЩО ИЗРАБОТЕНИ ЧАСОВЕ:</span> <strong>${общоЧасове.toFixed(2)} ч.</strong></div>
+                <div class="summary-line"><span>ОБЩА ЗАРАБОТКА (С БОНУСИ):</span> <strong>${общаЗаработка.toFixed(2)} €</strong></div>
+                <div class="summary-line"><span>ИЗПЛАТЕНИ АВАНСИ:</span> <strong style="color:orange">${сумаАванси.toFixed(2)} €</strong></div>
+                <div class="summary-line" style="background:#e8f5e9; padding:5px; border:none; margin-top:5px;"><span>ОСТАТЪК ЗА ПОЛУЧАВАНЕ:</span> <strong style="color:#2e7d32; font-size:16px;">${остатъкЗаПлащане.toFixed(2)} €</strong></div>
+            </div></div>`;
+            area.innerHTML += html;
+        });
+
+        if (currentViewMode === "admin") {
+            document.getElementById('dashContainer').innerHTML = `
+                <div class="dashboard">
+                    <div class="dash-box dash-avans"><span class="dash-label">ИЗПЛАТЕНИ АВАНСИ</span><span class="dash-value">${globalPaidAvansi.toFixed(2)} €</span></div>
+                    <div class="dash-box dash-zaplaty"><span class="dash-label">ОСТАТЪК ЗА ПЛАЩАНЕ</span><span class="dash-value">${globalOstatyk.toFixed(2)} €</span></div>
+                    <div class="dash-box dash-total"><span class="dash-label">ОБЩ ФОНД ЗАПЛАТИ</span><span class="dash-value">${globalTotalFond.toFixed(2)} €</span></div>
+                </div>
+                <div class="staff-section">
+                    <div class="staff-title">ФОНД ЗАПЛАТИ ПО МЕСЕЦИ</div>
+                    <div class="trend-wrap" id="payrollTrend"></div>
+                </div>`;
+            renderPayrollTrend();
+        }
+    }
+
+    function renderPayrollTrend() {
+        const el = document.getElementById('payrollTrend');
+        if (!el) return;
+        const totalsByMonth = {};
+        allResultsCache.forEach(r => {
+            const d = new Date(r.get("date"));
+            const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+            const h = r.get("hours") || 0, b = r.get("bonus") || 0;
+            if (h === -1) return; // авансите не се броят като нов фонд
+            const rate = staffRates[r.get("staff")] || 0;
+            totalsByMonth[key] = (totalsByMonth[key] || 0) + (h * rate + b);
+        });
+        const keys = Object.keys(totalsByMonth).sort();
+        const maxVal = Math.max(1, ...keys.map(k => totalsByMonth[k]));
+        el.innerHTML = '';
+        keys.forEach(key => {
+            const [yy, mm] = key.split('-');
+            const val = totalsByMonth[key];
+            const bar = document.createElement('div');
+            bar.className = 'trend-bar';
+            bar.style.height = Math.max(2, (val / maxVal) * 46) + 'px';
+            bar.setAttribute('data-label', `${monthNames[parseInt(mm,10)-1].slice(0,3)} ${yy}: ${val.toFixed(0)}€`);
+            el.appendChild(bar);
+        });
+    }
+
+    function exportPayrollCsv() {
+        const rows = window._payrollCsvRows || [];
+        if (!rows.length) { alert('Няма записи за избрания месец.'); return; }
+        let csv = '\uFEFFДата,Служител,Часове,Заработка (EUR),Бонус/Аванс (EUR)\n';
+        rows.forEach(r => { csv += r.map(f => `"${String(f).replace(/"/g,'""')}"`).join(',') + '\n'; });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `zaplati_${monthNames[viewMonth]}_${viewYear}.csv`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    async function payAdvance(name) {
+        const inputId = `adv_${name.replace(/\s/g,'')}`;
+        const inputEl = document.getElementById(inputId);
+        const amount = parseFloat(inputEl.value);
+        if(!amount || amount <= 0) return alert("Въведете сума!");
+        if(!confirm(`Записвате изплатен аванс от ${amount}€ на ${name}?`)) return;
+        try {
+            if (!navigator.onLine) throw new Error('offline');
+            const Log = Parse.Object.extend("WorkLog");
+            const entry = new Log();
+            await entry.save({ date: todayISO, staff: name, hours: -1, bonus: amount, paid: true });
+            inputEl.value = '';
+            await syncCreateReportEntry(entry.id, todayISO, name, -1, amount);
+            await loadData();
+        } catch(e) {
+            if (!navigator.onLine) {
+                const q = getQueue();
+                q.push({ date: todayISO, staff: name, hours: -1, bonus: amount });
+                setQueue(q);
+                inputEl.value = '';
+                updateOfflineBanner();
+                alert('Няма връзка — авансът е запазен локално и ще се изпрати автоматично.');
+            } else {
+                alert('Грешка при записване на аванса!');
+            }
+        }
+    }
+
+    function viewIndividual() {
+        const user = document.getElementById('userViewSel').value;
+        const pass = document.getElementById('userPass').value;
+        const adminMasterPass = '6775'; 
+
+        if (!user) {
+            alert("Моля, изберете име!");
+            return;
+        }
+
+        if (pass === userPasswords[user] || pass === adminMasterPass) {
+            currentViewMode = user;
+            document.getElementById('monthlyArea').style.display = 'block';
+            document.getElementById('passArea').style.display = 'none';
+            loadData();
+        } else {
+            alert("Грешна парола!");
+        }
+    }
+
+    function unlock() {
+        if(document.getElementById('p_field').value === 'MakKuin6775') {
+            currentViewMode = "admin";
+            document.getElementById('passArea').style.display = 'none';
+            document.getElementById('monthlyArea').style.display = 'block';
+            loadData();
+        } else alert("Грешна парола!");
+    }
+
+    function changeMonth(delta) {
+        viewMonth += delta;
+        if(viewMonth < 0){viewMonth=11; viewYear--;} if(viewMonth > 11){viewMonth=0; viewYear++;}
+        loadData();
+    }
+
+    function computeHours() {
+        const startVal = document.getElementById('start_time').value;
+        const endVal = document.getElementById('end_time').value;
+        const box = document.getElementById('computedHoursBox');
+        const errEl = document.getElementById('hoursErrorMsg');
+        const valEl = document.getElementById('computedHoursVal');
+        const earningsRow = document.getElementById('computedEarningsRow');
+        if (!startVal || !endVal) { box.style.display = 'none'; errEl.style.display = 'none'; return null; }
+
+        if (startVal === endVal) {
+            box.style.display = 'block';
+            valEl.textContent = '—';
+            earningsRow.style.display = 'none';
+            errEl.style.display = 'block';
+            return null; // еднакви часове - невалидна смяна, не се приема за 24ч.
+        }
+        errEl.style.display = 'none';
+
+        const [sh, sm] = startVal.split(':').map(Number);
+        const [eh, em] = endVal.split(':').map(Number);
+        let diff = (eh * 60 + em) - (sh * 60 + sm);
+        if (diff <= 0) diff += 24 * 60; // смяна, минаваща през полунощ
+        const hrs = diff / 60;
+        valEl.textContent = hrs.toFixed(2);
+        box.style.display = 'block';
+        return hrs;
+    }
+
+    function updateEarningsDisplay() {
+        const hrs = computeHours();
+        const row = document.getElementById('computedEarningsRow');
+        if (hrs === null) { row.style.display = 'none'; return; }
+        const staff = document.getElementById('staffSel').value;
+        const rate = staffRates[staff] || 0;
+        const bonus = parseFloat(document.getElementById('b_val').value) || 0;
+        const earnings = (hrs * rate) + bonus;
+        document.getElementById('computedEarningsVal').textContent = earnings.toFixed(2);
+        row.style.display = 'block';
+    }
+
+    document.getElementById('start_time').addEventListener('input', () => { validateForm(); });
+    document.getElementById('end_time').addEventListener('input', () => { validateForm(); });
+
+    function validateForm() {
+        const hrs = computeHours();
+        document.getElementById('saveBtn').disabled = (!document.getElementById('staffSel').value || hrs === null || hrs <= 0);
+        updateEarningsDisplay();
+    }
+
+    let undoTimeoutHandle = null, undoIntervalHandle = null;
+
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('saveBtn');
+        const hours = computeHours() || 0;
+        const bonus = parseFloat(document.getElementById('b_val').value) || 0;
+        const selectedStaff = document.getElementById('staffSel').value;
+
+        const existingToday = allResultsCache.filter(r => r.get('date') === todayISO && r.get('staff') === selectedStaff && r.get('hours') !== -1);
+        if (existingToday.length > 0) {
+            const totalSoFar = existingToday.reduce((sum, r) => sum + (r.get('hours') || 0), 0);
+            const ok = confirm(`${selectedStaff} вече има запис за днес (${totalSoFar.toFixed(2)} ч.). Сигурни ли сте, че искате да добавите ОЩЕ един запис?`);
+            if (!ok) return;
+        }
+
+        if (hours > HOURS_WARN_THRESHOLD || bonus > BONUS_WARN_THRESHOLD) {
+            const ok = confirm(`Внимание: ${hours.toFixed(2)} часа / ${bonus}€ бонус изглежда необичайно голямо. Потвърждавате ли записа?`);
+            if (!ok) return;
+        }
+
+        btn.disabled = true;
+        const paidChecked = document.getElementById('paidCheckbox').checked;
+        const payload = {
+            date: todayISO,
+            staff: selectedStaff,
+            hours: hours,
+            bonus: bonus,
+            paid: paidChecked
+        };
+
+        function resetFormFields() {
+            document.getElementById('start_time').value = '';
+            document.getElementById('end_time').value = '';
+            document.getElementById('b_val').value = '';
+            document.getElementById('paidCheckbox').checked = false;
+            document.getElementById('computedHoursBox').style.display = 'none';
+        }
+
+        try {
+            if (!navigator.onLine) throw new Error('offline');
+            const Log = Parse.Object.extend("WorkLog");
+            const entry = new Log();
+            await entry.save(payload);
+            resetFormFields();
+            document.getElementById('successStatus').style.display = 'block';
+            setTimeout(() => { document.getElementById('successStatus').style.display = 'none'; }, 2000);
+            await syncCreateReportEntry(entry.id, todayISO, selectedStaff, hours, bonus);
+            await loadData();
+            showUndoBox(entry.id);
+        } catch(e) {
+            if (!navigator.onLine) {
+                const q = getQueue(); q.push(payload); setQueue(q);
+                resetFormFields();
+                updateOfflineBanner();
+                alert('Няма връзка — записът е запазен локално и ще се изпрати автоматично.');
+            } else {
+                alert('Грешка при записване!');
+            }
+        } finally { btn.disabled = false; validateForm(); }
+    });
+
+    function showUndoBox(entryId) {
+        const box = document.getElementById('undoBox');
+        const timerEl = document.getElementById('undoTimer');
+        let seconds = 8;
+        timerEl.textContent = seconds;
+        box.style.display = 'block';
+        clearTimeout(undoTimeoutHandle); clearInterval(undoIntervalHandle);
+        undoIntervalHandle = setInterval(() => {
+            seconds--; timerEl.textContent = seconds;
+            if (seconds <= 0) clearInterval(undoIntervalHandle);
+        }, 1000);
+        undoTimeoutHandle = setTimeout(() => { box.style.display = 'none'; }, 8000);
+
+        document.getElementById('undoBtn').onclick = async () => {
+            clearTimeout(undoTimeoutHandle); clearInterval(undoIntervalHandle);
+            box.style.display = 'none';
+            try {
+                const Log = Parse.Object.extend("WorkLog");
+                const obj = new Log(); obj.id = entryId;
+                await obj.destroy();
+                await syncDeleteReportEntry(entryId);
+                await loadData();
+            } catch(e) { alert('Грешка при отмяна на записа.'); }
+        };
+    }
+
+    // ----- РЕДАКЦИЯ / ИЗТРИВАНЕ НА ЗАПИС -----
+    // (edit_staff вече се попълва динамично от renderStaffOptions())
+    let editingEntryId = null;
+
+    function openEditModal(id) {
+        const l = entryMap[id];
+        if (!l) return;
+        editingEntryId = id;
+        document.getElementById('edit_staff').value = l.get('staff');
+        document.getElementById('edit_hours').value = l.get('hours');
+        document.getElementById('edit_bonus').value = l.get('bonus') || 0;
+        document.getElementById('edit_paid').checked = !!l.get('paid');
+        document.getElementById('editModalStatus').textContent = '';
+        document.getElementById('editModal').classList.add('open');
+    }
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('open');
+        editingEntryId = null;
+    }
+    document.getElementById('editCancelBtn').addEventListener('click', closeEditModal);
+
+    document.getElementById('editSaveBtn').addEventListener('click', async () => {
+        if (!editingEntryId) return;
+        const st = document.getElementById('editModalStatus');
+        const h = parseFloat(document.getElementById('edit_hours').value);
+        const b = parseFloat(document.getElementById('edit_bonus').value) || 0;
+        const staffName = document.getElementById('edit_staff').value;
+        if (!staffName || isNaN(h)) {
+            st.textContent = 'Моля, попълнете коректно служител и часове.'; st.style.color = '#d32f2f';
+            return;
+        }
+        st.textContent = 'Запазване...'; st.style.color = '#555';
+        try {
+            const original = entryMap[editingEntryId];
+            const entryDate = original ? original.get('date') : todayISO;
+            const Log = Parse.Object.extend("WorkLog");
+            const obj = new Log(); obj.id = editingEntryId;
+            obj.set('staff', staffName);
+            obj.set('hours', h);
+            obj.set('bonus', b);
+            obj.set('paid', document.getElementById('edit_paid').checked);
+            await obj.save();
+            await syncUpdateReportEntry(editingEntryId, entryDate, staffName, h, b);
+            closeEditModal();
+            await loadData();
+        } catch(e) { st.textContent = 'Грешка при запазване.'; st.style.color = '#d32f2f'; }
+    });
+
+    document.getElementById('editDeleteBtn').addEventListener('click', async () => {
+        if (!editingEntryId) return;
+        if (!confirm('Сигурни ли сте, че искате да изтриете този запис?')) return;
+        const st = document.getElementById('editModalStatus');
+        st.textContent = 'Изтриване...'; st.style.color = '#555';
+        try {
+            const Log = Parse.Object.extend("WorkLog");
+            const obj = new Log(); obj.id = editingEntryId;
+            await obj.destroy();
+            await syncDeleteReportEntry(editingEntryId);
+            closeEditModal();
+            await loadData();
+        } catch(e) { st.textContent = 'Грешка при изтриване.'; st.style.color = '#d32f2f'; }
+    });
+
+    updateOfflineBanner();
+    loadRates().then(() => { loadData(); flushQueue(); });
+</script>
+</body>
+</html>
